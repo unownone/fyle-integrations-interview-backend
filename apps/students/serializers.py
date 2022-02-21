@@ -1,4 +1,3 @@
-from attr import attr
 from rest_framework import serializers
 from .models import Assignment
 
@@ -25,3 +24,4 @@ class StudentAssignmentSerializer(serializers.ModelSerializer):
             return attrs
 
         return super().validate(attrs)
+

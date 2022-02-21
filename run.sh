@@ -1,6 +1,5 @@
 #!/bin/bash
 
-source venv/bin/activate
+python3 manage.py migrate --noinput
+python3 manage.py runserver
 
-python manage.py migrate
-python manage.py runserver 0.0.0.0:8000

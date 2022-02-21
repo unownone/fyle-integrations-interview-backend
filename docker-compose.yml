@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  django:
+    tty: true
+    build: .
+    ports:
+      - "8000:8000"
+    command: bash -c "python3 manage.py migrate && python3 -u manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code

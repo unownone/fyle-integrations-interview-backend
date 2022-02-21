@@ -176,3 +176,105 @@ def test_grade_assignment_teacher_2(api_client, teacher_2):
     assert assignment['teacher'] == 2
     assert assignment['grade'] == grade
     assert assignment['id'] is not None
+
+
+@pytest.mark.django_db()
+def test_no_grade_provided(api_client, teacher_1):
+    """Testing case if no input has been provided
+    """
+    response = api_client.patch(
+        reverse('teachers-assignments'),
+        data=json.dumps({
+            'id': 1,
+        }),
+        HTTP_X_Principal=teacher_1,
+        content_type='application/json'
+    )
+    
+    assert response.status_code == 400
+    
+    error = response.json()
+    
+    assert error['non_field_errors'] == ['No Grade has been Provided']
+    
+@pytest.mark.django_db()
+def test_no_id_provided(api_client, teacher_1):
+    
+    grade = 'B'
+    response = api_client.patch(
+        reverse('teachers-assignments'),
+        data = json.dumps({
+            'grade':grade
+        }),
+        HTTP_X_Principal = teacher_1,
+        content_type = 'application/json'
+    )
+    
+    assert response.status_code == 400
+    
+    error = response.json()
+    
+    assert error['non_field_errors'] == ['No Assignment ID Provided']
+    
+@pytest.mark.django_db()  
+def test_wrong_id_provided(api_client, teacher_2):
+    
+    grade = 'A'
+    response = api_client.patch(
+        reverse('teachers-assignments'),
+        data = json.dumps({
+            'id':18, # Non Existent ID
+            'grade':grade
+        }),
+        HTTP_X_Principal = teacher_2,
+        content_type = 'application/json'
+    )
+    
+    assert response.status_code == 400
+    
+    error = response.json()
+    
+    assert error['non_field_errors'] == ['Assignment Not Found/Access Denied']
+    
+    
+@pytest.mark.django_db()
+def test_id_as_string_provided(api_client, teacher_1):
+    
+    grade = 'K'
+    response = api_client.patch(
+        reverse('teachers-assignments'),
+        data = json.dumps({
+            'id':'Not a number', # Assignment ID as a number
+            'grade':grade
+        }),
+        HTTP_X_Principal = teacher_1,
+        content_type = 'application/json'
+    )
+    
+    
+    assert response.status_code == 400
+    
+    error = response.json()
+    
+    assert error['non_field_errors'] == ['Assignment ID cannot be a string']
+    
+@pytest.mark.django_db()
+def grade_as_ASCII_equivalent_numbers(api_client, teacher_1):
+        
+    grade = 66
+    response = api_client.patch(
+        reverse('teacher-assignments'),
+        data = json.dumps({
+            'id':'Not a number', # Assignment ID as a number
+            'grade':grade
+        }),
+        HTTP_X_Principal = teacher_1,
+        content_type = 'application/json'
+    )
+    
+    assert response.status_code == 400
+    error = response.json()
+    
+    assert error['non_field_errors'] == ['Grade has to be between A and D']
+    
+
